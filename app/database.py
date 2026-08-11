@@ -24,5 +24,6 @@ def get_session():                          # Opens a new session (i.e. temp wor
 SessionDep = Annotated[Session, Depends(get_session)]   # Reusable alias to call get_session()
 
 
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+# Note: create_db_and_tables() no longer used in main. Table creation replaced and managed by Alembic.
+# def create_db_and_tables():
+#    SQLModel.metadata.create_all(engine)
