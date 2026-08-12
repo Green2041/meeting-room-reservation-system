@@ -6,6 +6,7 @@ from sqlmodel import SQLModel
 # Note: Pydantic Schema = What data is allowed in or out of API
 
 # Input Model
+# Note: Incoming data from user (i.e. not from db) therefore inherit from BaseModel b/c data already serialized.
 class RoomCreate(BaseModel):
     # Note omit id attribute from table model, to prevent overwrite existing room id
     name: str
