@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv     # To load the DATABASE_URL with password from our .env
 # Each model has to be imported here so Alembic can see it
 from app.models.room import Room  # noqa - Imported so its table registers in metadata
+from app.models.user import User   #noqa
 
 from alembic import context
 

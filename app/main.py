@@ -6,6 +6,7 @@ from app.database import SessionDep # create_db_and_tables (removed)
 from sqlalchemy import text
 from contextlib import asynccontextmanager
 from app.models.room import Room        # Note: Do Not Delete even though appears unused.
+from app.models.user import User
 from app.routers.room import router as rooms_router
 
 
