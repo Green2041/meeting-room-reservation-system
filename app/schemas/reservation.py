@@ -1,11 +1,10 @@
 # app/schemas/reservation.py
-from pydantic import BaseModel
 from sqlmodel import SQLModel
 from datetime import datetime
 
 
 # Input Schema
-class ReservationCreate(BaseModel):
+class ReservationCreate(SQLModel):
     room_id: int
     user_id: int
     start_time: datetime

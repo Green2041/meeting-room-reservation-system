@@ -1,9 +1,9 @@
-from pydantic import BaseModel
 from sqlmodel import SQLModel
 
 
 # Incoming Data Schema
-class UserCreate(BaseModel):    #Arg type BaseModel b/c incoming data is flat serialized json or dict.
+#Arg type BaseModel b/c incoming data is flat serialized json or dict.
+class UserCreate(SQLModel):     # Changed to SQLModel because inherits from BaseModel.
     full_name: str
     email: str
 

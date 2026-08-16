@@ -7,7 +7,8 @@ from sqlmodel import SQLModel
 
 # Input Schema
 # Note: Incoming data from user (i.e. not from db) therefore inherit from BaseModel b/c data already serialized.
-class RoomCreate(BaseModel):
+# Note 2: SQLModel inherits from BaseModel. So can use SQLModel for everything where previously used BaseModel.
+class RoomCreate(SQLModel):
     # Note omit id attribute from table model, to prevent overwrite existing room id
     name: str
     capacity: int
