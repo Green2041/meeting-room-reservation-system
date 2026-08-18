@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from app.models.room import Room        # Note: Do Not Delete even though appears unused.
 from app.models.user import User
 from app.routers.room import router as rooms_router
+from app.routers.reservation import router as reservations_router
 
 
 
@@ -35,3 +36,4 @@ def get_db_check(session:SessionDep):
 
 # Connect Router --> The Routers store the endpoints
 app.include_router(rooms_router)
+app.include_router(reservations_router)
