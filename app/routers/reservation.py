@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException    # HTTPException used for returning graceful conflict message
 from sqlmodel import select
+from sqlalchemy.exc import IntegrityError
 
 from app.schemas.reservation import ReservationCreate, ReservationPublic
 from app.database import SessionDep
@@ -15,7 +16,11 @@ def create_reservation(reservation: ReservationCreate, session: SessionDep): # I
     # Turns inbound ReservationCreate obj into type Reservation object
     temp_reservation = Reservation.model_validate(reservation)
     session.add(temp_reservation)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:                             # For returning graceful conflict message
+        session.rollback()              # Session commit failed, so need to roll back to previous state
+        raise HTTPException(status_code=409, detail="This room is already booked for that time.")
     session.refresh(temp_reservation)
     return temp_reservation
 
