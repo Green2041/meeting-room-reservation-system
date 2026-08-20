@@ -11,7 +11,7 @@ from app.models.reservation import Reservation
 router = APIRouter(prefix="/reservations", tags=["reservations"])
 
 # Create Reservation / POST
-@router.post("", response_model=ReservationPublic)
+@router.post("", response_model=ReservationPublic, status_code=201)
 def create_reservation(reservation: ReservationCreate, session: SessionDep): # Input param reservation: Type Res_Create
     # Turns inbound ReservationCreate obj into type Reservation object
     temp_reservation = Reservation.model_validate(reservation)
@@ -36,12 +36,16 @@ def get_all_reservations(session: SessionDep):
 @router.get("/{id}", response_model=ReservationPublic)
 def get_reservation(id: int, session: SessionDep):
     requested_reservation = session.get(Reservation, id) # Avoids manual SQL "select()". Get Reservation table & id #.
+    if requested_reservation is None:
+        raise HTTPException(status_code=404, detail="Reservation id not found")
     return requested_reservation
 
 # DELETE a reservation
-@router.delete("/{id}")                            # There is no db object returned --> No return type
+@router.delete("/{id}", status_code=204)      # There is nothing returned --> No return type & 204 response
 def delete_reservation(id: int, session: SessionDep):
     temp_reservation = session.get(Reservation, id)
+    if temp_reservation is None:
+        raise HTTPException(status_code=404, detail="Reservation id not found")
     session.delete(temp_reservation)
     session.commit()
-    return {"message": "Reservation deleted"}   # Return flat dict. Does not use response_model=ReservationPublic
+

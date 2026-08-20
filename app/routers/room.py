@@ -1,4 +1,4 @@
-from fastapi import APIRouter   # Needed to create router instance
+from fastapi import APIRouter, HTTPException   # APIRouter: Needed to create router instance | HTTPE: For exceptions
 from sqlmodel import select
 
 from app.schemas.room import RoomCreate, RoomPublic
@@ -10,7 +10,7 @@ from app.models.room import Room
 router = APIRouter(prefix="/rooms", tags=["rooms"])
 
 # CREATE
-@router.post("", response_model=RoomPublic)     # response_model --> What schema comes out
+@router.post("", response_model=RoomPublic, status_code=201)     # response_model --> What schema comes out
 def create_room(room: RoomCreate, session : SessionDep):   # Input parameter room: Type RoomCreate --> What comes in
     temp_room = Room.model_validate(room)   # Turns incoming RoomCreate type object into type Room object
     session.add(temp_room)                  # Add the converted Room object to a session
@@ -32,14 +32,17 @@ def get_all_rooms(session: SessionDep):             # No input parameter. Still 
 @router.get("/{id}", response_model=RoomPublic)     #Again return type RoomPublic
 def get_room(id: int, session: SessionDep):              # Input parameter room id. Need session connection parameter
     room_requested = session.get(Room, id)               # session.get(Room, id) avoids manual SQL with "select()"
+    if room_requested is None:
+        raise HTTPException(status_code=404, detail="Room id not found")
     return  room_requested
 
 
 
 # Delete a room
-@router.delete("/{id}")                             # There is nothing returned --> No return type
+@router.delete("/{id}", status_code=204)        # There is nothing returned --> No return type & 204 response
 def delete_room(id: int, session: SessionDep):       # Need room id: type int as input arg. Need session connect to db
     temp_room = session.get(Room, id)
+    if temp_room is None:
+        raise  HTTPException(status_code=404, detail="Room id not found")
     session.delete(temp_room)
     session.commit()                          # Need to commit the deletion in local session connection to the db table
-    return {"message": "No contents"}
