@@ -13,6 +13,8 @@ router = APIRouter(prefix="/reservations", tags=["reservations"])
 # Create Reservation / POST
 @router.post("", response_model=ReservationPublic, status_code=201)
 def create_reservation(reservation: ReservationCreate, session: SessionDep): # Input param reservation: Type Res_Create
+    if reservation.end_time <= reservation.start_time:       # Prevent user from submitting invalid reservation period
+        raise HTTPException(status_code=422, detail="end_time must be after start_time")
     # Turns inbound ReservationCreate obj into type Reservation object
     temp_reservation = Reservation.model_validate(reservation)
     session.add(temp_reservation)
