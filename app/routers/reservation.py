@@ -13,14 +13,18 @@ router = APIRouter(prefix="/reservations", tags=["reservations"])
 # Create Reservation / POST
 @router.post("", response_model=ReservationPublic, status_code=201)
 def create_reservation(reservation: ReservationCreate, session: SessionDep): # Input param reservation: Type Res_Create
-    if reservation.end_time <= reservation.start_time:       # Prevent user from submitting invalid reservation period
+    # Timezone requirement check (i.e. reject naive timezone inputs back to user)
+    if reservation.start_time.tzinfo is None or reservation.end_time.tzinfo is None:
+        raise HTTPException(status_code=422, detail="start_time and end_time must include timezone")
+    # Invalid reservation check (i.e. confirm end time not before or equal to start time)
+    if reservation.end_time <= reservation.start_time:
         raise HTTPException(status_code=422, detail="end_time must be after start_time")
     # Turns inbound ReservationCreate obj into type Reservation object
     temp_reservation = Reservation.model_validate(reservation)
     session.add(temp_reservation)
     try:
         session.commit()
-    except IntegrityError:                             # For returning graceful conflict message
+    except IntegrityError:               # For returning graceful conflict message
         session.rollback()              # Session commit failed, so need to roll back to previous state
         raise HTTPException(status_code=409, detail="This room is already booked for that time.")
     session.refresh(temp_reservation)
