@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 # Load the db from the .env connection string
 load_dotenv()           # dotenv locates the .env file
 db_url = os.environ.get("DATABASE_URL")        # Pull the database connection string from the .env
+if not db_url:      # Checks if db_url is None OR "" OR []. Not just None. So if empty string passed also fails.
+    raise RuntimeError("DATABASE_URL is not set. Add it to the .env file.")
 
 # Create the engine
 engine = create_engine(db_url)
